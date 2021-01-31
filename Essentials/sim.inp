@@ -1,0 +1,4 @@
+500000 numTimeSteps
+1.0 thermalEnergy
+0.001 timeStep
+5000 outputSteps
