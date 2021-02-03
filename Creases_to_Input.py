@@ -108,11 +108,13 @@ class Fold_Pattern(object):
         """
         Given the number of creases, it prompts the user to set what these creases are, 1 by 1. Order does not matter
 
-        A crease can be set, given the end-points of the line (in scaled coordinates) or given one point, angle
-        with x-axis and length. The second is more tricky, as the length has to be given in scaled coordinates
-        e.g. points (0, 0) and (1/2, 1/2), define a length of sqrt(2)/2. Angle is given in unscaled coordinates.
+        -A crease can be set, given the end-points of the line (in scaled coordinates) or given one point, angle
+        with x-axis and length.
+
+        -The second way of setting a crease, is more tricky, as the length has to be given in scaled coordinates
+        e.g. points (0, 0) and (1/2, 1/2), define a length of sqrt(2)/2. Angle is always given in unscaled coordinates.
         """
-        print('\n'+"There are two modes for crease input." + '\n' + "-> mode 1: By defining end-points" +"\n"+ "-> mode 2: By defining point, angle with x-axis and (scaled) length")
+        print('\n'+"There are two modes for crease input." + '\n' + "-> mode 1: By defining end-points in scaled coordinates" +"\n"+ "-> mode 2: By defining point, angle with x-axis and (scaled) length")
 
         for i in range (creases):
             print('\n' + f"Crease no. {i+1}")
@@ -121,13 +123,13 @@ class Fold_Pattern(object):
             if mode == 1:
                 if i >= 1:
                     print("Note: For point 1, you can input 'ps' or 'pe' which will use" + '\n' + "the previous crease's start or end (respectively) as point 1, for this crease")
-                p1 = input("Please give point 1 as ('x_coord y_coord'): ")
+                p1 = input("Please give point 1 as 'x_coord y_coord': ")
                 if p1 == "ps":
                     p1 = f"{self.crease_pattern[i-1][0][0][0]} {self.crease_pattern[i-1][0][0][1]}"
                 elif p1 == "pe":
                     p1 = f"{self.crease_pattern[i-1][0][1][0]} {self.crease_pattern[i-1][0][1][1]}"
 
-                p2 = input("Please give point 2 as ('x_coord y_coord'): ")
+                p2 = input("Please give point 2 as 'x_coord y_coord': ")
                 m_v = int(input("Mountain (type '-1') or valley ('1')?: "))
                 self.add_crease_pp(p1, p2, m_v)
 
@@ -157,6 +159,8 @@ class Fold_Pattern(object):
         Creates a node file. Implied that all nodes are initially inside the xy plane
         self.nodes = [(posx_i, posy_i)]
         """
+        print("Constructing nodes file")
+
         node_file = open("nodes.inp", 'w')
         mass = 1
         drag = 1
@@ -204,7 +208,6 @@ class Fold_Pattern(object):
             if (point_to_start.dot(point_to_start) == 0):
                 return False
             else:
-                print(f"Point {point} is in line {line}" + '\n')
                 return True
         else:
             return False
@@ -224,6 +227,9 @@ class Fold_Pattern(object):
         self.lines = [(start_point, vector, mv)]
         self.nodes_reduced_coord = [array([x_pos, y_pos])]
         """
+
+        print("Constructing bonds file")
+        print("Constructing nodes file")
 
         k = 400 #strength of bonds
         R = 0.2 #maximum extension (in scaled coordinates)
@@ -403,6 +409,7 @@ class Fold_Pattern(object):
 
         Note: There is no need to bother with the sign of the angle eventually as the enrgy is cosine dependent.
         """
+        print("Constructing bends file")
         self.triplets = []
         for n1 in range (len(self.nodes_reduced_coord)): #for every middle
             used_node_pairs = []
@@ -478,13 +485,14 @@ class Fold_Pattern(object):
         self.bonds_reduced = [(id1, id2, length, mv)]
         self.triplets = [[idi, idj, idk, angle]
         """
+        print("Constructing folds file")
         kh = 6
         ke = 1
         phi_min = 115
         phi_max = 155
 
         #FOR Waterbomb only
-        gamma_m, gamma_v = self.waterbomb_equilibrium(120)
+        #gamma_m, gamma_v = self.waterbomb_equilibrium(120)
 
         phi_eq = 135
         scale_potentials = True #if potential is scaled with size of crease
@@ -520,20 +528,24 @@ class Fold_Pattern(object):
             else:
                 fact = f[5]*np.sqrt((np.cos(theta) * self.paper_dims[0])**2 + (np.sin(theta) * self.paper_dims[1])**2)
 
+            """
             if f[4]>0:#if valley (only for waterbomb)
                 folds_file.write(f"{f[0]} {f[1]} {f[2]} {f[3]} {f[4]} {kh*fact} {ke*fact} {gamma_v-20} {gamma_v+20} {gamma_v} n1_n2_n3_n4_mv_khard_keasy_phimin_phimax_phieq" + '\n')
             else:
                 folds_file.write(f"{f[0]} {f[1]} {f[2]} {f[3]} {f[4]} {kh*fact} {ke*fact} {gamma_m-20} {gamma_m+20} {gamma_m} n1_n2_n3_n4_mv_khard_keasy_phimin_phimax_phieq" + '\n')
+            """
 
-            #folds_file.write(f"{f[0]} {f[1]} {f[2]} {f[3]} {f[4]} {kh/fact} {ke/fact} {phi_min} {phi_max} {phi_eq} n1_n2_n3_n4_mv_khard_keasy_phimin_phimax_phieq" + '\n')
+            folds_file.write(f"{f[0]} {f[1]} {f[2]} {f[3]} {f[4]} {kh/fact} {ke/fact} {phi_min} {phi_max} {phi_eq} n1_n2_n3_n4_mv_khard_keasy_phimin_phimax_phieq" + '\n')
         folds_file.close()
 
 
 
     def make_wcas(self):
         """
-        Excluded volume interactions file. Naive version
+        Excluded volume interactions file. Naive version. Establishes repulsion
+        in between all pairs of nodes. Improvement is possible (on paper). No time to do this during project
         """
+        print("Constructing (naive) version of wcas file")
 
         en = 1
         sigma = 1
@@ -548,62 +560,3 @@ class Fold_Pattern(object):
             wcas_file.write(f"{evi[0]} {evi[1]} {evi[2]} {evi[3]} node1_node2_energyscale_sigma" + '\n')
 
         wcas_file.close()
-
-
-
-"""
-Sequence to set the Miura Ori fold pattern
-    _______________________
-    | \__/  \__/  \__/  \_|
-    |_/  \__/  \__/  \__/ |
-    | \__/  \__/  \__/  \_|
-    |_/  \__/  \__/  \__/ |
-    -----------------------
-"""
-"""
-n = 5 #x_axis lattice points
-m = 5 #y_axis lattice points
-#Note: for valid folding, n and m must be odd
-
-frac = 1/4
-x_offset = frac/n
-#ang = 10 #defining the angular offset of "vertical" creases from y-axis (in degrees)
-#x_offset = (1/(2*m))*np.tan(np.radians(10))
-
-F = Fold_Pattern()
-lattice_y = np.linspace(0, 1, m+1)
-lattice_x = [np.linspace(0, 1, n+1), np.linspace(0, 1, n+1)]
-lattice_x[0][1:n] -= x_offset; lattice_x[1][1:n] += x_offset #establish zigzag pattern
-
-for i in range(1, m):
-    for j in range(1, n):
-        p1 = (lattice_x[i%2][j], lattice_y[i])
-        p21 = (lattice_x[i%2][j-1], lattice_y[i])
-        p22 = (lattice_x[(i-1)%2][j], lattice_y[i-1])
-        m_v1 = (-1)**(i+j)
-        m_v2 = (-1)**(j)
-        F.add_crease_pp(f"{p21[0]} {p21[1]}", f"{p1[0]} {p1[1]}", m_v1) #given point1 & point1, define crease
-        F.add_crease_pp(f"{p22[0]} {p22[1]}", f"{p1[0]} {p1[1]}", m_v2) #given point1 & point1, define crease
-        if i == m-1: #if you have reached topmost level
-            p23 = (lattice_x[(i-1)%2][j], lattice_y[i+1])
-            m_v3 = (-1)**(j)
-            F.add_crease_pp(f"{p23[0]} {p23[1]}", f"{p1[0]} {p1[1]}", m_v3) #given point1 & point1, define crease
-
-    p1 = (lattice_x[i%2][n], lattice_y[i])
-    p2 = (lattice_x[i%2][n-1], lattice_y[i])
-    m_v = (-1)**(i+n)
-    F.add_crease_pp(f"{p2[0]} {p2[1]}", f"{p1[0]} {p1[1]}", m_v) #given point1 & point1, define crease
-
-#print(F.crease_pattern)
-F.make_bonds_nodes_file()
-F.make_bends_file()
-F.make_folds_file()
-F.make_wcas()
-
-
-"""
-F = Fold_Pattern()
-F.crease_set_file("input_creases.txt")
-F.make_bonds_nodes_file()
-F.make_bends_file()
-F.make_folds_file()
