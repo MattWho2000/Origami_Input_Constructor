@@ -1,0 +1,17 @@
+16 NumBonds
+0 1 400 1.0 5.0 node1_node2_strength_R_D
+2 0 400 1.0 5.0 node1_node2_strength_R_D
+0 3 400 1.0 5.0 node1_node2_strength_R_D
+3 1 400 1.4142135623730951 7.0710678118654755 node1_node2_strength_R_D
+1 4 400 1.4142135623730951 7.0710678118654755 node1_node2_strength_R_D
+2 1 400 1.4142135623730951 7.0710678118654755 node1_node2_strength_R_D
+5 1 400 1.0 5.0 node1_node2_strength_R_D
+4 5 400 1.0 5.0 node1_node2_strength_R_D
+5 2 400 1.0 5.0 node1_node2_strength_R_D
+6 1 400 1.0 5.0 node1_node2_strength_R_D
+7 6 400 1.0 5.0 node1_node2_strength_R_D
+6 4 400 1.0 5.0 node1_node2_strength_R_D
+7 1 400 1.4142135623730951 7.0710678118654755 node1_node2_strength_R_D
+8 1 400 1.0 5.0 node1_node2_strength_R_D
+3 8 400 1.0 5.0 node1_node2_strength_R_D
+8 7 400 1.0 5.0 node1_node2_strength_R_D
