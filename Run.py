@@ -6,7 +6,7 @@ from Creases_to_Input import Fold_Pattern
 #examples of use of the class. Uncomment and run accordingly :)
 
 
-
+"""
 #Sequence to set crease pattern from CUI (terminal) input
 #suggested to start with this example to get an idea of how the code works
 #see comments in "Fold_Pattern.crease_set()" for extra info on how to set a crease pattern
@@ -15,12 +15,12 @@ F.crease_set(2) #2 is the number of creases the user is going to be prompted to 
 F.make_bonds_nodes_file()
 F.make_bends_file()
 F.make_folds_file()
-
-
-
-
-
 """
+
+
+
+
+
 #Sequence to set crease pattern from file.
 F = Fold_Pattern()
 F.crease_set_file("input_creases.txt")
@@ -28,7 +28,7 @@ F.make_bonds_nodes_file()
 F.make_bends_file()
 F.make_folds_file()
 
-"""
+
 
 
 

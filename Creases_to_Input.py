@@ -25,7 +25,7 @@ class Fold_Pattern(object):
         if ar == "A4":
             self.aspect_ratio = np.sqrt(2)
         else:
-            n = float(eval(ar[:(ar.find('/'))]))
+            n = float(eval(ar[(ar.find('/'))]))
             m = float(eval(ar[(ar.find('/')+1):]))
             self.aspect_ratio = float(n/m)
 
@@ -231,7 +231,7 @@ class Fold_Pattern(object):
         print("Constructing bonds file")
         print("Constructing nodes file")
 
-        k = 400 #strength of bonds
+        k = 100 #strength of bonds
         R = 0.2 #maximum extension (in scaled coordinates)
         mass = 1
         drag = 1
@@ -400,7 +400,7 @@ class Fold_Pattern(object):
         """
         To create the bends file given self.bonds_reduced and self.nodes_reduced_coord
         """
-        k = 600
+        k = 20
         """
         Find all triplets of adjacent nodes. Examine all nodes one by one and make triplets using couples from their adjacent nodes.
         Note down the nodes participating and the angle defined for each triplet. Then for each node, delete the triplets
@@ -486,16 +486,16 @@ class Fold_Pattern(object):
         self.triplets = [[idi, idj, idk, angle]
         """
         print("Constructing folds file")
-        kh = 6
-        ke = 1
+        kh = 1.
+        ke = 1/8
         phi_min = 115
         phi_max = 155
 
         #FOR Waterbomb only
-        #gamma_m, gamma_v = self.waterbomb_equilibrium(120)
+        gamma_m, gamma_v = self.waterbomb_equilibrium(50)
 
         phi_eq = 135
-        scale_potentials = True #if potential is scaled with size of crease
+        scale_potentials = False #if potential is scaled with size of crease
         self.folds = []
 
         for b in self.bonds_reduced:
@@ -528,14 +528,14 @@ class Fold_Pattern(object):
             else:
                 fact = f[5]*np.sqrt((np.cos(theta) * self.paper_dims[0])**2 + (np.sin(theta) * self.paper_dims[1])**2)
 
-            """
-            if f[4]>0:#if valley (only for waterbomb)
+
+            if f[4]>0:#if valley (this conditional is only for waterbomb)
                 folds_file.write(f"{f[0]} {f[1]} {f[2]} {f[3]} {f[4]} {kh*fact} {ke*fact} {gamma_v-20} {gamma_v+20} {gamma_v} n1_n2_n3_n4_mv_khard_keasy_phimin_phimax_phieq" + '\n')
             else:
                 folds_file.write(f"{f[0]} {f[1]} {f[2]} {f[3]} {f[4]} {kh*fact} {ke*fact} {gamma_m-20} {gamma_m+20} {gamma_m} n1_n2_n3_n4_mv_khard_keasy_phimin_phimax_phieq" + '\n')
-            """
 
-            folds_file.write(f"{f[0]} {f[1]} {f[2]} {f[3]} {f[4]} {kh/fact} {ke/fact} {phi_min} {phi_max} {phi_eq} n1_n2_n3_n4_mv_khard_keasy_phimin_phimax_phieq" + '\n')
+
+            #folds_file.write(f"{f[0]} {f[1]} {f[2]} {f[3]} {f[4]} {kh/fact} {ke/fact} {phi_min} {phi_max} {phi_eq} n1_n2_n3_n4_mv_khard_keasy_phimin_phimax_phieq" + '\n')
         folds_file.close()
 
 
