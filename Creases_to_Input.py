@@ -163,7 +163,7 @@ class Fold_Pattern(object):
 
         node_file = open("nodes.inp", 'w')
         mass = 1
-        drag = 1
+        drag = 10
 
         self.nodes_reduced_coord = []
         corners = np.array([(0,0), (0,1), (1,1), (1,0)]) #scaled coord
@@ -231,10 +231,10 @@ class Fold_Pattern(object):
         print("Constructing bonds file")
         print("Constructing nodes file")
 
-        k = 100 #strength of bonds
+        k = 10000 #strength of bonds
         R = 0.2 #maximum extension (in scaled coordinates)
         mass = 1
-        drag = 1
+        drag = 10
 
         corners = np.array([(0,0), (0,1), (1,1), (1,0)]) #scaled coord
 
@@ -407,7 +407,7 @@ class Fold_Pattern(object):
         that are not the simplest. By the term simplest, we mean that there is no triplet that defines an angle that is smaller.
         Only reason to exclude a triplet that is simple, is because it defines an angle of 180 degrees (and thus is tangent to some other crease).
 
-        Note: There is no need to bother with the sign of the angle eventually as the enrgy is cosine dependent.
+        Note: There is no need to bother with the sign of the angle eventually as the energy is cosine dependent.
         """
         print("Constructing bends file")
         self.triplets = []
@@ -455,7 +455,7 @@ class Fold_Pattern(object):
             bends_file = open("bends.inp", 'w')
             bends_file.write(f"{len(self.triplets)} NumBends" + '\n')
             for t in self.triplets:
-                bends_file.write(f"{t[0]} {t[1]} {t[2]} {k} {abs(t[3])} node1_node2_node3_strength_eqangle" + '\n')
+                bends_file.write(f"{t[0]} {t[1]} {t[2]} {k} {180.0 - abs(t[3])} node1_node2_node3_strength_eqangle" + '\n')
             bends_file.close()
 
 
@@ -486,13 +486,13 @@ class Fold_Pattern(object):
         self.triplets = [[idi, idj, idk, angle]
         """
         print("Constructing folds file")
-        kh = 1.
+        kh = 1
         ke = 1/8
         phi_min = 115
         phi_max = 155
 
         #FOR Waterbomb only
-        gamma_m, gamma_v = self.waterbomb_equilibrium(50)
+        gamma_m, gamma_v = self.waterbomb_equilibrium(30)
 
         phi_eq = 135
         scale_potentials = False #if potential is scaled with size of crease
@@ -530,9 +530,9 @@ class Fold_Pattern(object):
 
 
             if f[4]>0:#if valley (this conditional is only for waterbomb)
-                folds_file.write(f"{f[0]} {f[1]} {f[2]} {f[3]} {f[4]} {kh*fact} {ke*fact} {gamma_v-20} {gamma_v+20} {gamma_v} n1_n2_n3_n4_mv_khard_keasy_phimin_phimax_phieq" + '\n')
+                folds_file.write(f"{f[0]} {f[1]} {f[2]} {f[3]} {f[4]} {kh*fact} {ke*fact} {gamma_v-5} {gamma_v+5} {gamma_v} n1_n2_n3_n4_mv_khard_keasy_phimin_phimax_phieq" + '\n')
             else:
-                folds_file.write(f"{f[0]} {f[1]} {f[2]} {f[3]} {f[4]} {kh*fact} {ke*fact} {gamma_m-20} {gamma_m+20} {gamma_m} n1_n2_n3_n4_mv_khard_keasy_phimin_phimax_phieq" + '\n')
+                folds_file.write(f"{f[0]} {f[1]} {f[2]} {f[3]} {f[4]} {kh*fact} {ke*fact} {gamma_m-5} {gamma_m+5} {gamma_m} n1_n2_n3_n4_mv_khard_keasy_phimin_phimax_phieq" + '\n')
 
 
             #folds_file.write(f"{f[0]} {f[1]} {f[2]} {f[3]} {f[4]} {kh/fact} {ke/fact} {phi_min} {phi_max} {phi_eq} n1_n2_n3_n4_mv_khard_keasy_phimin_phimax_phieq" + '\n')
