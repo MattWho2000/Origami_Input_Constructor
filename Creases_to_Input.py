@@ -163,7 +163,7 @@ class Fold_Pattern(object):
 
         node_file = open("nodes.inp", 'w')
         mass = 1
-        drag = 10
+        drag = 100
 
         self.nodes_reduced_coord = []
         corners = np.array([(0,0), (0,1), (1,1), (1,0)]) #scaled coord
@@ -231,7 +231,7 @@ class Fold_Pattern(object):
         print("Constructing bonds file")
         print("Constructing nodes file")
 
-        k = 10000 #strength of bonds
+        k = 1000 #strength of bonds
         R = 0.2 #maximum extension (in scaled coordinates)
         mass = 1
         drag = 10
@@ -400,7 +400,7 @@ class Fold_Pattern(object):
         """
         To create the bends file given self.bonds_reduced and self.nodes_reduced_coord
         """
-        k = 20
+        k = 100
         """
         Find all triplets of adjacent nodes. Examine all nodes one by one and make triplets using couples from their adjacent nodes.
         Note down the nodes participating and the angle defined for each triplet. Then for each node, delete the triplets
@@ -486,13 +486,13 @@ class Fold_Pattern(object):
         self.triplets = [[idi, idj, idk, angle]
         """
         print("Constructing folds file")
-        kh = 1
-        ke = 1/8
+        kh = 1/2
+        ke = 1/16
         phi_min = 115
         phi_max = 155
 
         #FOR Waterbomb only
-        gamma_m, gamma_v = self.waterbomb_equilibrium(30)
+        gamma_m, gamma_v = self.waterbomb_equilibrium(50)
 
         phi_eq = 135
         scale_potentials = False #if potential is scaled with size of crease
@@ -530,9 +530,9 @@ class Fold_Pattern(object):
 
 
             if f[4]>0:#if valley (this conditional is only for waterbomb)
-                folds_file.write(f"{f[0]} {f[1]} {f[2]} {f[3]} {f[4]} {kh*fact} {ke*fact} {gamma_v-5} {gamma_v+5} {gamma_v} n1_n2_n3_n4_mv_khard_keasy_phimin_phimax_phieq" + '\n')
+                folds_file.write(f"{f[0]} {f[1]} {f[2]} {f[3]} {f[4]} {kh*fact} {ke*fact} {gamma_v-20} {gamma_v+20} {gamma_v} n1_n2_n3_n4_mv_khard_keasy_phimin_phimax_phieq" + '\n')
             else:
-                folds_file.write(f"{f[0]} {f[1]} {f[2]} {f[3]} {f[4]} {kh*fact} {ke*fact} {gamma_m-5} {gamma_m+5} {gamma_m} n1_n2_n3_n4_mv_khard_keasy_phimin_phimax_phieq" + '\n')
+                folds_file.write(f"{f[0]} {f[1]} {f[2]} {f[3]} {f[4]} {kh*fact} {ke*fact} {gamma_m-20} {gamma_m+20} {gamma_m} n1_n2_n3_n4_mv_khard_keasy_phimin_phimax_phieq" + '\n')
 
 
             #folds_file.write(f"{f[0]} {f[1]} {f[2]} {f[3]} {f[4]} {kh/fact} {ke/fact} {phi_min} {phi_max} {phi_eq} n1_n2_n3_n4_mv_khard_keasy_phimin_phimax_phieq" + '\n')
