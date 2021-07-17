@@ -22,7 +22,7 @@ F.make_folds_file()
 
 
 #Sequence to set crease pattern from file.
-F = Fold_Pattern()
+F = Fold_Pattern(wb_octag = True)
 F.crease_set_file("input_creases.txt")
 F.make_bonds_nodes_file()
 F.make_bends_file()

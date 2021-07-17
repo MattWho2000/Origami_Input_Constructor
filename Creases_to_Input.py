@@ -9,7 +9,7 @@ class Fold_Pattern(object):
     Input can be provided from the terminal or given a file.
     """
 
-    def __init__(self):
+    def __init__(self, wb_octag = False):
         """
         Simply initializes a rectangular piece of paper with no folds.
 
@@ -28,10 +28,10 @@ class Fold_Pattern(object):
             n = float(eval(ar[(ar.find('/'))]))
             m = float(eval(ar[(ar.find('/')+1):]))
             self.aspect_ratio = float(n/m)
-
         self.paper_dims = (short, self.aspect_ratio*short)
         self.crease_pattern = []  #line segments ((point1), (point2)) in scaled coordinates
 
+        self.wb_octag = wb_octag #if you want an octagonal waterbomb. This is used later to scale down length of diagonals
 
 
 
@@ -78,6 +78,8 @@ class Fold_Pattern(object):
             raise Exception("coordinates of point 2 outside of allowed range")
 
         self.crease_pattern.append(((point1, point2), m_v))
+
+
 
 
     def crease_set_file(self, filename):
@@ -163,10 +165,10 @@ class Fold_Pattern(object):
 
         node_file = open("nodes.inp", 'w')
         mass = 1
-        drag = 100
+        drag = 10
 
         self.nodes_reduced_coord = []
-        corners = np.array([(0,0), (0,1), (1,1), (1,0)]) #scaled coord
+        corners = np.array([(0,0), (0,1), (1,1), (1,0)])*self.oct_diag_scale #scaled coord
         self.nodes = []
         #Check if the nodes at the endpoints of each crease have been already appended. If not, append them
         for i in range(4):
@@ -312,6 +314,7 @@ class Fold_Pattern(object):
 
         bond_file.write(f"{len(self.bonds_reduced)} NumBonds" + '\n')
         node_file.write(f"{len(self.nodes_reduced_coord)} NumNodes" + '\n')
+        self.compress_corners()
 
         for n in self.nodes_reduced_coord:
             node_file.write(f"{self.paper_dims[0]*n[0]} {self.paper_dims[1]*n[1]} 0 {drag} {mass} x_y_z_drag_mass" + '\n')
@@ -323,6 +326,30 @@ class Fold_Pattern(object):
             bond_file.write(f"{b[0]} {b[1]} {k} {R*np.sqrt(vec.dot(vec))} {np.sqrt(vec.dot(vec))} node1_node2_strength_R_D" + '\n')
         bond_file.close()
 
+
+
+
+    def compress_corners(self):
+        """
+        Checks if origami is waterbomb and if it is octagonal.
+        If yes, it compresses down the corners in the self.nodes_reduced_coord array.
+        """
+
+        if not self.wb_octag:
+            return
+
+        diff = 1/2 - np.sqrt(2)/4
+        corners = [(0,0), (0,1), (1,1), (1,0)]
+        mapped_corners = [(diff, diff), (diff,1-diff), (1-diff,1-diff), (1-diff,diff)]
+
+        self.nodes_reduced_coord = list(self.nodes_reduced_coord)
+
+        for i in range (len(self.nodes_reduced_coord)):
+            nn = (self.nodes_reduced_coord[i][0], self.nodes_reduced_coord[i][1])
+            if nn in corners: #if nodes are corner nodes, map them accordingly
+                self.nodes_reduced_coord[i] = mapped_corners[corners.index(nn)]
+
+        self.nodes_reduced_coord = np.array(self.nodes_reduced_coord)
 
 
 
