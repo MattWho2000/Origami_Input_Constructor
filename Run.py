@@ -1,13 +1,14 @@
 import numpy as np
 import sys
 from Creases_to_Input import Fold_Pattern
+from pathlib import Path
 
 
 #examples of use of the class. Uncomment and run accordingly :)
 
 
 """
-#Sequence to set crease pattern from CUI (terminal) input
+#Sequence to set crease pattern from CLI (terminal) input
 #suggested to start with this example to get an idea of how the code works
 #see comments in "Fold_Pattern.crease_set()" for extra info on how to set a crease pattern
 F = Fold_Pattern()
@@ -18,19 +19,16 @@ F.make_folds_file()
 """
 
 
-
-
-
 #Sequence to set crease pattern from file.
 F = Fold_Pattern(wb_octag = True)
 F.crease_set_file("input_creases.txt")
-F.make_bonds_nodes_file()
-F.make_bends_file()
-F.make_folds_file()
+F.make_bonds_nodes_file(1000, 1, 10)
+F.make_bends_file(1000)
+F.make_folds_file(0)
 
 
 
-
+#Path(dir+f"/out{i}/refined_data").mkdir(parents=True, exist_ok=True)
 
 
 """

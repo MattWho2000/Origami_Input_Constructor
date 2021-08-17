@@ -1,4 +1,5 @@
 import numpy as np
+import os
 import sys
 
 class Fold_Pattern(object):
@@ -9,7 +10,7 @@ class Fold_Pattern(object):
     Input can be provided from the terminal or given a file.
     """
 
-    def __init__(self, wb_octag = False):
+    def __init__(self, wb_octag = False, out_dir = "", cluster = False):
         """
         Simply initializes a rectangular piece of paper with no folds.
 
@@ -18,9 +19,12 @@ class Fold_Pattern(object):
 
         You can also write the "A4" string for the ratio (with the tall side parallel to y_axis again).
         """
-
-        ar = str(input("Please give aspect ratio as N/M (long/short): "))
-        short = float(input("Please give the length of the short side: "))
+        if cluster == False:
+            ar = str(input("Please give aspect ratio as N/M (long/short): "))
+            short = float(input("Please give the length of the short side: "))
+        else:
+            ar = "1"
+            short = 1.0
 
         if ar == "A4":
             self.aspect_ratio = np.sqrt(2)
@@ -32,7 +36,7 @@ class Fold_Pattern(object):
         self.crease_pattern = []  #line segments ((point1), (point2)) in scaled coordinates
 
         self.wb_octag = wb_octag #if you want an octagonal waterbomb. This is used later to scale down length of diagonals
-
+        self.out_dir = out_dir #output directory for files to go to
 
 
 
@@ -47,8 +51,6 @@ class Fold_Pattern(object):
         point2 = point2.split()
         point2 = (eval(point2[0]), eval(point2[1]))
         self.crease_pattern.append(((point1, point2), m_v))
-
-
 
 
 
@@ -89,7 +91,7 @@ class Fold_Pattern(object):
         filec = open(filename, 'r')
         lines = filec.readlines()
         for i in range (1, len(lines), 5):
-            print(f"Reading folds No. {i}")
+            #print(f"Reading folds No. {i}")
             mode = int(lines[i])
 
             if mode == 1:
@@ -101,7 +103,7 @@ class Fold_Pattern(object):
 
                 p2 = lines[i+2]
                 m_v = int(lines[i+3])
-                print(f"{p1} {p2} {m_v}")
+                #print(f"{p1} {p2} {m_v}")
                 self.add_crease_pp(p1, p2, m_v)
 
 
@@ -163,9 +165,9 @@ class Fold_Pattern(object):
         """
         print("Constructing nodes file")
 
-        node_file = open("nodes.inp", 'w')
+        node_file = open(os.path.join(self.out_dir, "nodes.inp"), 'w')
         mass = 1
-        drag = 10
+        drag = 0.1
 
         self.nodes_reduced_coord = []
         corners = np.array([(0,0), (0,1), (1,1), (1,0)])*self.oct_diag_scale #scaled coord
@@ -218,7 +220,7 @@ class Fold_Pattern(object):
 
 
 
-    def make_bonds_nodes_file(self):
+    def make_bonds_nodes_file(self, k_bonds, m, d):
         """
         Creates a node and bond file. To be called after creases have been set
         It goes through the creases and "notes down" all lines that will have to become bonds, assuming a rectangular piece of paper
@@ -233,10 +235,10 @@ class Fold_Pattern(object):
         print("Constructing bonds file")
         print("Constructing nodes file")
 
-        k = 1000 #strength of bonds
+        k = k_bonds #strength of bonds
         R = 0.2 #maximum extension (in scaled coordinates)
-        mass = 1
-        drag = 10
+        mass = m
+        drag = d
 
         corners = np.array([(0,0), (0,1), (1,1), (1,0)]) #scaled coord
 
@@ -309,8 +311,8 @@ class Fold_Pattern(object):
 
 
         """Make the bond and node files"""
-        bond_file = open("bonds.inp", 'w')
-        node_file = open("nodes.inp", 'w')
+        bond_file = open(os.path.join(self.out_dir, "bonds.inp"), 'w')
+        node_file = open(os.path.join(self.out_dir, "nodes.inp"), 'w')
 
         bond_file.write(f"{len(self.bonds_reduced)} NumBonds" + '\n')
         node_file.write(f"{len(self.nodes_reduced_coord)} NumNodes" + '\n')
@@ -357,7 +359,6 @@ class Fold_Pattern(object):
     #test for approximate equality (for floating point types)
     def arreqclose_in_list(self, myarr, list_arrays):
         return next((True for elem in list_arrays if elem.size == myarr.size and np.allclose(elem, myarr)), False)
-
 
 
 
@@ -423,11 +424,11 @@ class Fold_Pattern(object):
 
 
 
-    def make_bends_file(self):
+    def make_bends_file(self, k_bends):
         """
         To create the bends file given self.bonds_reduced and self.nodes_reduced_coord
         """
-        k = 100
+        k = k_bends
         """
         Find all triplets of adjacent nodes. Examine all nodes one by one and make triplets using couples from their adjacent nodes.
         Note down the nodes participating and the angle defined for each triplet. Then for each node, delete the triplets
@@ -479,7 +480,7 @@ class Fold_Pattern(object):
 
             #print('\n' + f"Here are the triplets: {self.triplets}" + '\n')
 
-            bends_file = open("bends.inp", 'w')
+            bends_file = open(os.path.join(self.out_dir, "bends.inp"), 'w')
             bends_file.write(f"{len(self.triplets)} NumBends" + '\n')
             for t in self.triplets:
                 bends_file.write(f"{t[0]} {t[1]} {t[2]} {k} {180.0 - abs(t[3])} node1_node2_node3_strength_eqangle" + '\n')
@@ -503,7 +504,7 @@ class Fold_Pattern(object):
         return abs(np.degrees(gamma_m)), abs(np.degrees(gamma_v))
 
 
-    def make_folds_file(self):
+    def make_folds_file(self, k_tor):
         """
         To be called after bends are made
         Makes the folds file.
@@ -511,10 +512,12 @@ class Fold_Pattern(object):
         in the variable mv, which is zero for non-creases, -1 for valleys and 1 for mountains), and then use the triplets to find suitable anchor points
         self.bonds_reduced = [(id1, id2, length, mv)]
         self.triplets = [[idi, idj, idk, angle]
+
+        ktor sets the scale for the torsion potentials
         """
         print("Constructing folds file")
-        kh = 1/2
-        ke = 1/16
+        kh = k_tor
+        ke = k_tor/16
         phi_min = 115
         phi_max = 155
 
@@ -545,7 +548,7 @@ class Fold_Pattern(object):
                 self.folds.append([n0, b[1], b[0], n3, b[3], b[2]]) #last is the length of the crease in scaled coordinates
         #print(f"The folds are the following: {self.folds}")
 
-        folds_file = open("folds.inp", 'w')
+        folds_file = open(os.path.join(self.out_dir, "folds.inp"), 'w')
         folds_file.write(f"{len(self.folds)} NumFolds" + '\n')
         for f in self.folds:
             theta = np.arccos((self.nodes_reduced_coord[f[2]][0] - self.nodes_reduced_coord[f[2]][0])/f[5])
@@ -582,7 +585,7 @@ class Fold_Pattern(object):
                 if i != j:
                     EVI.append([i, j, en, sigma])
 
-        wcas_file = open("wcas.inp", 'w')
+        wcas_file = (os.path.join(self.out_dir, "wcas.inp"), 'w')
         for evi in EVI:
             wcas_file.write(f"{evi[0]} {evi[1]} {evi[2]} {evi[3]} node1_node2_energyscale_sigma" + '\n')
 
