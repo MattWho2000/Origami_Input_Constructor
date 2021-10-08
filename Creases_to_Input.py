@@ -489,14 +489,17 @@ class Fold_Pattern(object):
 
     def waterbomb_equilibrium(self, theta):
         """Given theta find equilibria for mountain and valley folds"""
+        if theta == 90:
+            return 0,0
         theta = np.radians(theta)
         c = np.arccos(np.cos(theta)**2)
 
         B = np.arcsin(np.sin(theta)/np.sin(c))
-        E = np.cos(np.sin(c)/(np.cos(c) + 1))
+        E = np.arccos(np.sin(c)/(np.cos(c) + 1))
+        print(theta, c, B, E)
         gamma_v = np.arccos(2*np.cos(c) - 1) - np.pi
 
-        if theta <= np.pi/2:
+        if theta < np.pi/2:
             gamma_m = 2*(B + E - np.pi/2)
         else:
             gamma_m = 2*(np.arccos(1/np.sin(c) - 1/np.tan(c)) - B + np.pi/2)
@@ -504,7 +507,7 @@ class Fold_Pattern(object):
         return abs(np.degrees(gamma_m)), abs(np.degrees(gamma_v))
 
 
-    def make_folds_file(self, k_tor):
+    def make_folds_file(self, k_tor, equil):
         """
         To be called after bends are made
         Makes the folds file.
@@ -517,12 +520,12 @@ class Fold_Pattern(object):
         """
         print("Constructing folds file")
         kh = k_tor
-        ke = k_tor/16
+        ke = k_tor
         phi_min = 115
         phi_max = 155
 
         #FOR Waterbomb only
-        gamma_m, gamma_v = self.waterbomb_equilibrium(50)
+        gamma_m, gamma_v = self.waterbomb_equilibrium(equil)
 
         phi_eq = 135
         scale_potentials = False #if potential is scaled with size of crease
