@@ -14,3 +14,5 @@ As can be seen in "Run.py", there are two main ways to set a crease pattern. One
 -Second line is one of the endpoints of the crease (e.g. '1/2 1/2' refers to the centre of mass of the piece of paper irrespective of its dimensions. Or '1 1' specifies top-right corner of paper)
 -Third line specifies the other end-point for the crease.
 -Fourth line is mountain (-1), or valley (1).
+
+Constructed files are then to be used as prescribed by origamiMD
