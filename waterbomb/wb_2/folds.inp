@@ -1,9 +1,0 @@
-8 NumFolds
-2 1 0 3 -1 30.0 5.0 115 155 135 n1_n2_n3_n4_mv_khard_keasy_phimin_phimax_phieq
-0 1 3 8 1 42.42640687119285 7.0710678118654755 115 155 135 n1_n2_n3_n4_mv_khard_keasy_phimin_phimax_phieq
-5 4 1 6 1 42.42640687119285 7.0710678118654755 115 155 135 n1_n2_n3_n4_mv_khard_keasy_phimin_phimax_phieq
-5 1 2 0 1 42.42640687119285 7.0710678118654755 115 155 135 n1_n2_n3_n4_mv_khard_keasy_phimin_phimax_phieq
-4 1 5 2 -1 30.0 5.0 115 155 135 n1_n2_n3_n4_mv_khard_keasy_phimin_phimax_phieq
-7 1 6 4 -1 30.0 5.0 115 155 135 n1_n2_n3_n4_mv_khard_keasy_phimin_phimax_phieq
-8 1 7 6 1 42.42640687119285 7.0710678118654755 115 155 135 n1_n2_n3_n4_mv_khard_keasy_phimin_phimax_phieq
-3 1 8 7 -1 30.0 5.0 115 155 135 n1_n2_n3_n4_mv_khard_keasy_phimin_phimax_phieq
